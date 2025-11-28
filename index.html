@@ -806,30 +806,327 @@
                     </div>
                 </div>
 
-                <!-- Other Pages (Placeholder) -->
+                <!-- Purchases Page -->
                 <div id="purchasesPage" class="page-content hidden">
-                    <h2>Purchases</h2>
-                    <p style="color: #6b7280; margin-top: 20px;">Purchase management coming soon...</p>
+                    <div class="section-header">
+                        <h2>Purchases</h2>
+                        <button class="btn-primary" id="addPurchaseBtn">+ Add Purchase</button>
+                    </div>
+
+                    <div class="success-message" id="purchaseSuccess">Purchase added successfully!</div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Supplier</th>
+                                    <th>Items</th>
+                                    <th>Total Amount</th>
+                                    <th>Paid</th>
+                                    <th>Due</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="purchasesTable">
+                                <tr>
+                                    <td>2025-11-20</td>
+                                    <td>Philips</td>
+                                    <td>100</td>
+                                    <td>₹15,000</td>
+                                    <td>₹10,000</td>
+                                    <td style="color: #ef4444; font-weight: bold;">₹5,000</td>
+                                    <td><span class="badge warning">Pending</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-icon btn-view" onclick="viewPurchase(this)">👁️ View</button>
+                                            <button class="btn-icon btn-delete" onclick="deletePurchase(this)">🗑️ Delete</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2025-11-18</td>
+                                    <td>Havells</td>
+                                    <td>200</td>
+                                    <td>₹5,000</td>
+                                    <td>₹5,000</td>
+                                    <td>₹0</td>
+                                    <td><span class="badge success">Paid</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-icon btn-view" onclick="viewPurchase(this)">👁️ View</button>
+                                            <button class="btn-icon btn-delete" onclick="deletePurchase(this)">🗑️ Delete</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
+                <!-- Customers Page -->
                 <div id="customersPage" class="page-content hidden">
-                    <h2>Customers</h2>
-                    <p style="color: #6b7280; margin-top: 20px;">Customer management coming soon...</p>
+                    <div class="section-header">
+                        <h2>Customers</h2>
+                        <button class="btn-primary" id="addCustomerBtn">+ Add Customer</button>
+                    </div>
+
+                    <div class="success-message" id="customerSuccess">Customer added successfully!</div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Customer Name</th>
+                                    <th>Phone</th>
+                                    <th>Address</th>
+                                    <th>Total Credit</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customersTable">
+                                <tr>
+                                    <td>ABC Traders</td>
+                                    <td>9876543210</td>
+                                    <td>123 Market St</td>
+                                    <td style="color: #ef4444; font-weight: bold;">₹800</td>
+                                    <td><span class="badge warning">Credit Due</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-icon btn-edit" onclick="editCustomer(this)">✏️ Edit</button>
+                                            <button class="btn-icon btn-delete" onclick="deleteCustomer(this)">🗑️ Delete</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>XYZ Electronics</td>
+                                    <td>9876543211</td>
+                                    <td>456 Shop Lane</td>
+                                    <td style="color: #ef4444; font-weight: bold;">₹1,500</td>
+                                    <td><span class="badge warning">Credit Due</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-icon btn-edit" onclick="editCustomer(this)">✏️ Edit</button>
+                                            <button class="btn-icon btn-delete" onclick="deleteCustomer(this)">🗑️ Delete</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
+                <!-- Suppliers Page -->
                 <div id="suppliersPage" class="page-content hidden">
-                    <h2>Suppliers</h2>
-                    <p style="color: #6b7280; margin-top: 20px;">Supplier management coming soon...</p>
+                    <div class="section-header">
+                        <h2>Suppliers</h2>
+                        <button class="btn-primary" id="addSupplierBtn">+ Add Supplier</button>
+                    </div>
+
+                    <div class="success-message" id="supplierSuccess">Supplier added successfully!</div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Supplier Name</th>
+                                    <th>Phone</th>
+                                    <th>Address</th>
+                                    <th>Total Due</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="suppliersTable">
+                                <tr>
+                                    <td>Philips</td>
+                                    <td>9999999999</td>
+                                    <td>Mumbai</td>
+                                    <td style="color: #ef4444; font-weight: bold;">₹5,000</td>
+                                    <td><span class="badge warning">Payment Due</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-icon btn-edit" onclick="editSupplier(this)">✏️ Edit</button>
+                                            <button class="btn-icon btn-delete" onclick="deleteSupplier(this)">🗑️ Delete</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Havells</td>
+                                    <td>8888888888</td>
+                                    <td>Delhi</td>
+                                    <td>₹0</td>
+                                    <td><span class="badge success">Clear</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-icon btn-edit" onclick="editSupplier(this)">✏️ Edit</button>
+                                            <button class="btn-icon btn-delete" onclick="deleteSupplier(this)">🗑️ Delete</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
+                <!-- Expenses Page -->
                 <div id="expensesPage" class="page-content hidden">
-                    <h2>Expenses</h2>
-                    <p style="color: #6b7280; margin-top: 20px;">Expense tracking coming soon...</p>
+                    <div class="section-header">
+                        <h2>Expenses</h2>
+                        <button class="btn-primary" id="addExpenseBtn">+ Add Expense</button>
+                    </div>
+
+                    <div class="success-message" id="expenseSuccess">Expense added successfully!</div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Category</th>
+                                    <th>Amount</th>
+                                    <th>Description</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expensesTable">
+                                <tr>
+                                    <td>2025-11-27</td>
+                                    <td>Rent</td>
+                                    <td>₹5,000</td>
+                                    <td>Shop rent for November</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-icon btn-edit" onclick="editExpense(this)">✏️ Edit</button>
+                                            <button class="btn-icon btn-delete" onclick="deleteExpense(this)">🗑️ Delete</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2025-11-26</td>
+                                    <td>Electricity</td>
+                                    <td>₹1,200</td>
+                                    <td>Monthly electricity bill</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-icon btn-edit" onclick="editExpense(this)">✏️ Edit</button>
+                                            <button class="btn-icon btn-delete" onclick="deleteExpense(this)">🗑️ Delete</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2025-11-25</td>
+                                    <td>Salaries</td>
+                                    <td>₹15,000</td>
+                                    <td>Employee salaries</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-icon btn-edit" onclick="editExpense(this)">✏️ Edit</button>
+                                            <button class="btn-icon btn-delete" onclick="deleteExpense(this)">🗑️ Delete</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
+                <!-- Reports Page -->
                 <div id="reportsPage" class="page-content hidden">
-                    <h2>Reports</h2>
-                    <p style="color: #6b7280; margin-top: 20px;">Reports generation coming soon...</p>
+                    <h2 style="margin-bottom: 20px;">Reports</h2>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <!-- Sales Report -->
+                        <div class="table-container" style="padding: 20px;">
+                            <h3 style="margin-bottom: 15px; color: #1f2937;">📊 Sales Summary</h3>
+                            <div style="margin-bottom: 10px;">
+                                <strong>Total Sales:</strong> ₹4,750
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <strong>Total Transactions:</strong> 3
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <strong>Cash Sales:</strong> ₹2,950
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <strong>Credit Sales:</strong> ₹1,800
+                            </div>
+                            <button class="btn-primary" style="margin-top: 10px; width: 100%;" onclick="downloadReport('sales')">📥 Download Sales Report</button>
+                        </div>
+
+                        <!-- Expense Report -->
+                        <div class="table-container" style="padding: 20px;">
+                            <h3 style="margin-bottom: 15px; color: #1f2937;">💰 Expense Summary</h3>
+                            <div style="margin-bottom: 10px;">
+                                <strong>Total Expenses:</strong> ₹21,200
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <strong>Rent:</strong> ₹5,000
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <strong>Utilities:</strong> ₹1,200
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <strong>Salaries:</strong> ₹15,000
+                            </div>
+                            <button class="btn-primary" style="margin-top: 10px; width: 100%;" onclick="downloadReport('expenses')">📥 Download Expense Report</button>
+                        </div>
+
+                        <!-- Inventory Report -->
+                        <div class="table-container" style="padding: 20px;">
+                            <h3 style="margin-bottom: 15px; color: #1f2937;">📦 Inventory Summary</h3>
+                            <div style="margin-bottom: 10px;">
+                                <strong>Total Products:</strong> 4
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <strong>In Stock:</strong> 2
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <strong>Low Stock:</strong> 2
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <strong>Total Value:</strong> ₹14,375
+                            </div>
+                            <button class="btn-primary" style="margin-top: 10px; width: 100%;" onclick="downloadReport('inventory')">📥 Download Inventory Report</button>
+                        </div>
+
+                        <!-- Credit Report -->
+                        <div class="table-container" style="padding: 20px;">
+                            <h3 style="margin-bottom: 15px; color: #1f2937;">💳 Credit Summary</h3>
+                            <div style="margin-bottom: 10px;">
+                                <strong>Customer Credit:</strong> ₹2,300
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <strong>Supplier Dues:</strong> ₹5,000
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <strong>Net Position:</strong> -₹2,700
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <strong>Pending Payments:</strong> 3
+                            </div>
+                            <button class="btn-primary" style="margin-top: 10px; width: 100%;" onclick="downloadReport('credit')">📥 Download Credit Report</button>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 30px;">
+                        <h3 style="margin-bottom: 15px; color: #1f2937;">📅 Date Range Reports</h3>
+                        <div class="table-container" style="padding: 20px;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 15px; align-items: end;">
+                                <div>
+                                    <label style="display: block; margin-bottom: 5px; font-weight: 500;">From Date</label>
+                                    <input type="date" id="reportFromDate" style="width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 6px;">
+                                </div>
+                                <div>
+                                    <label style="display: block; margin-bottom: 5px; font-weight: 500;">To Date</label>
+                                    <input type="date" id="reportToDate" style="width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 6px;">
+                                </div>
+                                <button class="btn-primary" onclick="generateCustomReport()">📊 Generate Report</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -918,6 +1215,138 @@
                 <div class="form-actions">
                     <button type="button" class="btn-cancel" id="cancelSale">Cancel</button>
                     <button type="submit" class="btn-save">Save Sale</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Purchase Modal -->
+    <div id="purchaseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Purchase</h3>
+                <button class="close-btn" onclick="closePurchaseModal()">&times;</button>
+            </div>
+            <form id="purchaseForm">
+                <div class="form-row">
+                    <label>Supplier Name *</label>
+                    <input type="text" id="purchaseSupplier" required placeholder="e.g., Philips">
+                </div>
+                <div class="form-row">
+                    <label>Number of Items *</label>
+                    <input type="number" id="purchaseItems" required placeholder="e.g., 100" min="1">
+                </div>
+                <div class="form-row">
+                    <label>Total Amount (₹) *</label>
+                    <input type="number" id="purchaseTotal" required placeholder="e.g., 15000" min="0" step="0.01">
+                </div>
+                <div class="form-row">
+                    <label>Amount Paid (₹) *</label>
+                    <input type="number" id="purchasePaid" required placeholder="e.g., 10000" min="0" step="0.01">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closePurchaseModal()">Cancel</button>
+                    <button type="submit" class="btn-save">Save Purchase</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Customer Modal -->
+    <div id="customerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="customerModalTitle">Add Customer</h3>
+                <button class="close-btn" onclick="closeCustomerModal()">&times;</button>
+            </div>
+            <form id="customerForm">
+                <div class="form-row">
+                    <label>Customer Name *</label>
+                    <input type="text" id="customerName" required placeholder="e.g., ABC Traders">
+                </div>
+                <div class="form-row">
+                    <label>Phone Number *</label>
+                    <input type="tel" id="customerPhone" required placeholder="e.g., 9876543210">
+                </div>
+                <div class="form-row">
+                    <label>Address</label>
+                    <textarea id="customerAddress" rows="2" placeholder="Enter address"></textarea>
+                </div>
+                <div class="form-row">
+                    <label>Credit Amount (₹)</label>
+                    <input type="number" id="customerCredit" placeholder="e.g., 0" min="0" step="0.01" value="0">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeCustomerModal()">Cancel</button>
+                    <button type="submit" class="btn-save" id="saveCustomerBtn">Save Customer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Supplier Modal -->
+    <div id="supplierModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="supplierModalTitle">Add Supplier</h3>
+                <button class="close-btn" onclick="closeSupplierModal()">&times;</button>
+            </div>
+            <form id="supplierForm">
+                <div class="form-row">
+                    <label>Supplier Name *</label>
+                    <input type="text" id="supplierName" required placeholder="e.g., Philips">
+                </div>
+                <div class="form-row">
+                    <label>Phone Number *</label>
+                    <input type="tel" id="supplierPhone" required placeholder="e.g., 9999999999">
+                </div>
+                <div class="form-row">
+                    <label>Address</label>
+                    <textarea id="supplierAddress" rows="2" placeholder="Enter address"></textarea>
+                </div>
+                <div class="form-row">
+                    <label>Due Amount (₹)</label>
+                    <input type="number" id="supplierDue" placeholder="e.g., 0" min="0" step="0.01" value="0">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeSupplierModal()">Cancel</button>
+                    <button type="submit" class="btn-save" id="saveSupplierBtn">Save Supplier</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Expense Modal -->
+    <div id="expenseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="expenseModalTitle">Add Expense</h3>
+                <button class="close-btn" onclick="closeExpenseModal()">&times;</button>
+            </div>
+            <form id="expenseForm">
+                <div class="form-row">
+                    <label>Category *</label>
+                    <select id="expenseCategory" required>
+                        <option value="">Select Category</option>
+                        <option value="Rent">Rent</option>
+                        <option value="Electricity">Electricity</option>
+                        <option value="Salaries">Salaries</option>
+                        <option value="Transport">Transport</option>
+                        <option value="Maintenance">Maintenance</option>
+                        <option value="Others">Others</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Amount (₹) *</label>
+                    <input type="number" id="expenseAmount" required placeholder="e.g., 5000" min="0" step="0.01">
+                </div>
+                <div class="form-row">
+                    <label>Description</label>
+                    <textarea id="expenseDescription" rows="3" placeholder="Enter details"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeExpenseModal()">Cancel</button>
+                    <button type="submit" class="btn-save" id="saveExpenseBtn">Save Expense</button>
                 </div>
             </form>
         </div>
