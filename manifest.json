@@ -2,7 +2,7 @@
   "name": "Shop Manager Pro",
   "short_name": "ShopManager",
   "description": "Simple & Fast Business Tracking App",
-  "start_url": "/",
+  "start_url": "/shop-/",
   "display": "standalone",
   "background_color": "#667eea",
   "theme_color": "#667eea",
