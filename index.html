@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Simple & Fast Business Tracking App">
+    <meta name="theme-color" content="#667eea">
+    <title>Shop Manager Pro</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <style>
+        /* Add install button styles */
+        .install-prompt {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #10b981;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 50px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: none;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            cursor: pointer;
+            font-weight: bold;
+            animation: slideUp 0.3s ease;
+        }
+        
+        .install-prompt.show {
+            display: flex;
+        }
+        
+        @keyframes slideUp {
+            from { bottom: -100px; opacity: 0; }
+            to { bottom: 20px; opacity: 1; }
+        }
+        
+        /* Existing styles remain the same... */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .stat-card h3 {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .stat-card.sales .value {
+            color: #10b981;
+        }
+
+        .stat-card.due .value {
+            color: #ef4444;
+        }
+
+        .stat-card.expense .value {
+            color: #f59e0b;
+        }
+
+        .stat-card.transport .value {
+            color: #8b5cf6;
+        }
+
+        .content {
+            display: none;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            background: #f9fafb;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .delete-btn {
+            padding: 6px 12px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .delete-btn:hover {
+            background: #dc2626;
+        }
+
+        .success-msg {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .success-msg.show {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                overflow-x: auto;
+            }
+            
+            table {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Install Prompt -->
+    <div class="install-prompt" id="installPrompt">
+        📱 Install App
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>📊 Shop Manager</h1>
+            <p>Simple & Fast Business Tracking</p>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('dashboard')">📊 Dashboard</button>
+            <button class="tab" onclick="showTab('sales')">💰 Sales</button>
+            <button class="tab" onclick="showTab('purchases')">📦 Purchases</button>
+            <button class="tab" onclick="showTab('transport')">🚚 Transport</button>
+            <button class="tab" onclick="showTab('expenses')">💸 Expenses</button>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboard" class="content active">
+            <div class="dashboard">
+                <div class="stat-card sales">
+                    <h3>Today's Sales</h3>
+                    <div class="value" id="totalSales">₹0</div>
+                </div>
+                <div class="stat-card transport">
+                    <h3>Transport Income (Today)</h3>
+                    <div class="value" id="totalTransportIncome">₹0</div>
+                </div>
+                <div class="stat-card due">
+                    <h3>Supplier Payment Due</h3>
+                    <div class="value" id="totalDue">₹0</div>
+                </div>
+                <div class="stat-card expense">
+                    <h3>Today's Expenses</h3>
+                    <div class="value" id="totalExpenses">₹0</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📈 Recent Activity</h2>
+                <div id="recentActivity" style="margin-top: 15px; color: #666;">
+                    <p>No activity yet. Start by adding sales, purchases, transport, or expenses.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sales Section -->
+        <div id="sales" class="content">
+            <div class="card">
+                <h2>💰 Record Sale</h2>
+                <div class="success-msg" id="saleSuccess">Sale recorded successfully!</div>
+                
+                <form id="saleForm">
+                    <div class="form-group">
+                        <label>Sale Amount (₹) *</label>
+                        <input type="number" id="saleAmount" required placeholder="Enter amount" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Customer Name (Optional)</label>
+                        <input type="text" id="saleCustomer" placeholder="Enter customer name">
+                    </div>
+                    <button type="submit" class="btn">Record Sale</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>Sales History</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Customer</th>
+                            <th>Amount</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="salesTable">
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: #999;">No sales recorded yet</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Purchases Section -->
+        <div id="purchases" class="content">
+            <div class="card">
+                <h2>📦 Record Purchase from Supplier</h2>
+                <div class="success-msg" id="purchaseSuccess">Purchase recorded successfully!</div>
+                
+                <form id="purchaseForm">
+                    <div class="form-group">
+                        <label>Supplier Name *</label>
+                        <input type="text" id="purchaseSupplier" required placeholder="Enter supplier name">
+                    </div>
+                    <div class="form-group">
+                        <label>Total Amount (₹) *</label>
+                        <input type="number" id="purchaseTotal" required placeholder="Enter total amount" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Amount Paid (₹) *</label>
+                        <input type="number" id="purchasePaid" required placeholder="Enter amount paid" min="0" step="0.01">
+                    </div>
+                    <button type="submit" class="btn">Record Purchase</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>Purchase History</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Supplier</th>
+                            <th>Total</th>
+                            <th>Paid</th>
+                            <th>Due</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="purchasesTable">
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: #999;">No purchases recorded yet</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Expenses Section -->
+        <div id="expenses" class="content">
+            <div class="card">
+                <h2>💸 Record Expense</h2>
+                <div class="success-msg" id="expenseSuccess">Expense recorded successfully!</div>
+                
+                <form id="expenseForm">
+                    <div class="form-group">
+                        <label>Expense Category *</label>
+                        <select id="expenseCategory" required>
+                            <option value="">Select Category</option>
+                            <option value="Rent">Rent</option>
+                            <option value="Electricity">Electricity</option>
+                            <option value="Salaries">Salaries</option>
+                            <option value="Transport">Transport</option>
+                            <option value="Maintenance">Maintenance</option>
+                            <option value="Others">Others</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Amount (₹) *</label>
+                        <input type="number" id="expenseAmount" required placeholder="Enter amount" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Description (Optional)</label>
+                        <input type="text" id="expenseDescription" placeholder="Enter description">
+                    </div>
+                    <button type="submit" class="btn">Record Expense</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>Expense History</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Category</th>
+                            <th>Amount</th>
+                            <th>Description</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expensesTable">
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: #999;">No expenses recorded yet</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Transport Section -->
+        <div id="transport" class="content">
+            <div class="card">
+                <h2>🚚 Record Transport Income</h2>
+                <div class="success-msg" id="transportIncomeSuccess">Transport income recorded successfully!</div>
+                
+                <form id="transportIncomeForm">
+                    <div class="form-group">
+                        <label>Trip/Order Details *</label>
+                        <input type="text" id="transportTrip" required placeholder="e.g., Delhi to Mumbai">
+                    </div>
+                    <div class="form-group">
+                        <label>Income Amount (₹) *</label>
+                        <input type="number" id="transportIncome" required placeholder="Enter income amount" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Customer Name (Optional)</label>
+                        <input type="text" id="transportCustomer" placeholder="Enter customer name">
+                    </div>
+                    <button type="submit" class="btn">Record Income</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>Transport Income History</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Trip/Order</th>
+                            <th>Customer</th>
+                            <th>Income</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transportIncomeTable">
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: #999;">No transport income recorded yet</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // PWA Install Prompt
+        let deferredPrompt;
+        const installPrompt = document.getElementById('installPrompt');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installPrompt.classList.add('show');
+        });
+
+        installPrompt.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                deferredPrompt = null;
+                installPrompt.classList.remove('show');
+            }
+        });
+
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(reg => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker registration failed'));
+            });
+        }
+
+        // Data storage using localStorage
+        let sales = JSON.parse(localStorage.getItem('sales')) || [];
+        let purchases = JSON.parse(localStorage.getItem('purchases')) || [];
+        let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+        let transportIncome = JSON.parse(localStorage.getItem('transportIncome')) || [];
+
+        function saveData() {
+            localStorage.setItem('sales', JSON.stringify(sales));
+            localStorage.setItem('purchases', JSON.stringify(purchases));
+            localStorage.setItem('expenses', JSON.stringify(expenses));
+            localStorage.setItem('transportIncome', JSON.stringify(transportIncome));
+        }
+
+        // Tab switching
+        function showTab(tabName) {
+            document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabName === 'dashboard') {
+                updateDashboard();
+            }
+        }
+
+        // Update Dashboard
+        function updateDashboard() {
+            const today = new Date().toDateString();
+            
+            const todaySales = sales
+                .filter(s => new Date(s.date).toDateString() === today)
+                .reduce((sum, s) => sum + s.amount, 0);
+            
+            const todayTransportIncome = transportIncome
+                .filter(t => new Date(t.date).toDateString() === today)
+                .reduce((sum, t) => sum + t.amount, 0);
+            
+            const totalDue = purchases.reduce((sum, p) => sum + p.due, 0);
+            
+            const todayExpenses = expenses
+                .filter(e => new Date(e.date).toDateString() === today)
+                .reduce((sum, e) => sum + e.amount, 0);
+            
+            document.getElementById('totalSales').textContent = `₹${todaySales.toLocaleString()}`;
+            document.getElementById('totalTransportIncome').textContent = `₹${todayTransportIncome.toLocaleString()}`;
+            document.getElementById('totalDue').textContent = `₹${totalDue.toLocaleString()}`;
+            document.getElementById('totalExpenses').textContent = `₹${todayExpenses.toLocaleString()}`;
+            
+            updateRecentActivity();
+        }
+
+        function updateRecentActivity() {
+            const activity = document.getElementById('recentActivity');
+            const allActivities = [
+                ...sales.map(s => ({...s, type: 'sale'})),
+                ...purchases.map(p => ({...p, type: 'purchase'})),
+                ...expenses.map(e => ({...e, type: 'expense'})),
+                ...transportIncome.map(t => ({...t, type: 'transport'}))
+            ].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+            
+            if (allActivities.length === 0) {
+                activity.innerHTML = '<p>No activity yet. Start by adding sales, purchases, transport, or expenses.</p>';
+            } else {
+                let html = '<ul style="list-style: none; padding: 0;">';
+                allActivities.forEach(a => {
+                    let icon = a.type === 'sale' ? '💰' : a.type === 'purchase' ? '📦' : a.type === 'expense' ? '💸' : '🚚';
+                    const time = new Date(a.date).toLocaleString();
+                    let text = '';
+                    
+                    if (a.type === 'sale') {
+                        text = `Sale: ₹${a.amount.toLocaleString()}`;
+                        if (a.customer) text += ` - ${a.customer}`;
+                    } else if (a.type === 'purchase') {
+                        text = `Purchase from ${a.supplier}: ₹${a.total.toLocaleString()} (Due: ₹${a.due.toLocaleString()})`;
+                    } else if (a.type === 'expense') {
+                        text = `${a.category}: ₹${a.amount.toLocaleString()}`;
+                    } else if (a.type === 'transport') {
+                        text = `Transport Income: ₹${a.amount.toLocaleString()} - ${a.trip}`;
+                    }
+                    
+                    html += `<li style="padding: 10px; border-bottom: 1px solid #eee;">${icon} ${text}<br><small style="color: #999;">${time}</small></li>`;
+                });
+                html += '</ul>';
+                activity.innerHTML = html;
+            }
+        }
+
+        // Sales Form
+        document.getElementById('saleForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const sale = {
+                id: Date.now(),
+                date: new Date().toISOString(),
+                amount: parseFloat(document.getElementById('saleAmount').value),
+                customer: document.getElementById('saleCustomer').value || 'Walk-in Customer'
+            };
+            
+            sales.unshift(sale);
+            saveData();
+            renderSales();
+            updateDashboard();
+            
+            showSuccess('saleSuccess');
+            this.reset();
+        });
+
+        function renderSales() {
+            const tbody = document.getElementById('salesTable');
+            
+            if (sales.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #999;">No sales recorded yet</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = sales.map(s => `
+                <tr>
+                    <td>${new Date(s.date).toLocaleString()}</td>
+                    <td>${s.customer}</td>
+                    <td>₹${s.amount.toLocaleString()}</td>
+                    <td><button class="delete-btn" onclick="deleteSale(${s.id})">Delete</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function deleteSale(id) {
+            if (confirm('Delete this sale?')) {
+                sales = sales.filter(s => s.id !== id);
+                saveData();
+                renderSales();
+                updateDashboard();
+            }
+        }
+
+        // Purchase Form
+        document.getElementById('purchaseForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const total = parseFloat(document.getElementById('purchaseTotal').value);
+            const paid = parseFloat(document.getElementById('purchasePaid').value);
+            
+            const purchase = {
+                id: Date.now(),
+                date: new Date().toISOString(),
+                supplier: document.getElementById('purchaseSupplier').value,
+                total: total,
+                paid: paid,
+                due: total - paid
+            };
+            
+            purchases.unshift(purchase);
+            saveData();
+            renderPurchases();
+            updateDashboard();
+            
+            showSuccess('purchaseSuccess');
+            this.reset();
+        });
+
+        function renderPurchases() {
+            const tbody = document.getElementById('purchasesTable');
+            
+            if (purchases.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #999;">No purchases recorded yet</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = purchases.map(p => {
+                const dueStyle = p.due > 0 ? 'color: #ef4444; font-weight: bold;' : '';
+                return `
+                    <tr>
+                        <td>${new Date(p.date).toLocaleDateString()}</td>
+                        <td>${p.supplier}</td>
+                        <td>₹${p.total.toLocaleString()}</td>
+                        <td>₹${p.paid.toLocaleString()}</td>
+                        <td style="${dueStyle}">₹${p.due.toLocaleString()}</td>
+                        <td><button class="delete-btn" onclick="deletePurchase(${p.id})">Delete</button></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function deletePurchase(id) {
+            if (confirm('Delete this purchase?')) {
+                purchases = purchases.filter(p => p.id !== id);
+                saveData();
+                renderPurchases();
+                updateDashboard();
+            }
+        }
+
+        // Expense Form
+        document.getElementById('expenseForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const expense = {
+                id: Date.now(),
+                date: new Date().toISOString(),
+                category: document.getElementById('expenseCategory').value,
+                amount: parseFloat(document.getElementById('expenseAmount').value),
+                description: document.getElementById('expenseDescription').value
+            };
+            
+            expenses.unshift(expense);
+            saveData();
+            renderExpenses();
+            updateDashboard();
+            
+            showSuccess('expenseSuccess');
+            this.reset();
+        });
+
+        function renderExpenses() {
+            const tbody = document.getElementById('expensesTable');
+            
+            if (expenses.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999;">No expenses recorded yet</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = expenses.map(e => `
+                <tr>
+                    <td>${new Date(e.date).toLocaleDateString()}</td>
+                    <td>${e.category}</td>
+                    <td>₹${e.amount.toLocaleString()}</td>
+                    <td>${e.description || '-'}</td>
+                    <td><button class="delete-btn" onclick="deleteExpense(${e.id})">Delete</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function deleteExpense(id) {
+            if (confirm('Delete this expense?')) {
+                expenses = expenses.filter(e => e.id !== id);
+                saveData();
+                renderExpenses();
+                updateDashboard();
+            }
+        }
+
+        // Transport Income Form
+        document.getElementById('transportIncomeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const income = {
+                id: Date.now(),
+                date: new Date().toISOString(),
+                trip: document.getElementById('transportTrip').value,
+                amount: parseFloat(document.getElementById('transportIncome').value),
+                customer: document.getElementById('transportCustomer').value || 'N/A'
+            };
+            
+            transportIncome.unshift(income);
+            saveData();
+            renderTransportIncome();
+            updateDashboard();
+            
+            showSuccess('transportIncomeSuccess');
+            this.reset();
+        });
+
+        function renderTransportIncome() {
+            const tbody = document.getElementById('transportIncomeTable');
+            
+            if (transportIncome.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999;">No transport income recorded yet</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = transportIncome.map(t => `
+                <tr>
+                    <td>${new Date(t.date).toLocaleString()}</td>
+                    <td>${t.trip}</td>
+                    <td>${t.customer}</td>
+                    <td>₹${t.amount.toLocaleString()}</td>
+                    <td><button class="delete-btn" onclick="deleteTransportIncome(${t.id})">Delete</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function deleteTransportIncome(id) {
+            if (confirm('Delete this transport income?')) {
+                transportIncome = transportIncome.filter(t => t.id !== id);
+                saveData();
+                renderTransportIncome();
+                updateDashboard();
+            }
+        }
+
+        function showSuccess(elementId) {
+            const msg = document.getElementById(elementId);
+            msg.classList.add('show');
+            setTimeout(() => msg.classList.remove('show'), 3000);
+        }
+
+        // Initialize on load
+        renderSales();
+        renderPurchases();
+        renderExpenses();
+        renderTransportIncome();
+        updateDashboard();
+    </script>
+</body>
+</html>
