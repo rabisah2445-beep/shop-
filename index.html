@@ -326,6 +326,7 @@
             <button class="tab" onclick="showTab('transport')">🚚 Transport</button>
             <button class="tab" onclick="showTab('expenses')">💸 Expenses</button>
             <button class="tab" onclick="showTab('reports')">📈 Reports</button>
+            <button class="tab" onclick="showTab('backup')">💾 Backup</button>
         </div>
 
         <!-- Dashboard -->
@@ -607,6 +608,72 @@
                 <div id="yearlySummary"></div>
             </div>
         </div>
+
+        <!-- Backup Section -->
+        <div id="backup" class="content">
+            <div class="card">
+                <h2>💾 Data Backup & Restore</h2>
+                <p style="color: #666; margin-bottom: 20px;">Backup your data to keep it safe. You can restore it anytime if you change devices or lose data.</p>
+                
+                <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #f59e0b;">
+                    <strong>📧 Email Backup</strong>
+                    <p style="margin-top: 10px; color: #78350f;">Send all your business data to your email. Keep it safe in Gmail forever!</p>
+                </div>
+
+                <button onclick="emailBackup()" class="btn" style="width: 100%; margin-bottom: 15px;">
+                    📧 Email Backup to Myself
+                </button>
+
+                <div style="background: #dbeafe; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #3b82f6;">
+                    <strong>📥 Download Backup</strong>
+                    <p style="margin-top: 10px; color: #1e40af;">Download your data as a file. Save it to Google Drive, WhatsApp, or anywhere you want!</p>
+                </div>
+
+                <button onclick="downloadBackup()" class="btn" style="width: 100%; margin-bottom: 15px; background: #3b82f6;">
+                    📥 Download Backup File
+                </button>
+
+                <div style="background: #dcfce7; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #10b981;">
+                    <strong>📤 Restore from Backup</strong>
+                    <p style="margin-top: 10px; color: #065f46;">Restore your data from a backup file you saved earlier.</p>
+                </div>
+
+                <input type="file" id="restoreFile" accept=".json" style="display: none;" onchange="restoreBackup(event)">
+                <button onclick="document.getElementById('restoreFile').click()" class="btn" style="width: 100%; background: #10b981;">
+                    📤 Restore from Backup File
+                </button>
+
+                <div style="background: #fee2e2; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #ef4444;">
+                    <strong>⚠️ Delete All Data</strong>
+                    <p style="margin-top: 10px; color: #991b1b;">Permanently delete all your business data. This cannot be undone!</p>
+                    <button onclick="deleteAllData()" class="btn btn-danger" style="width: 100%; margin-top: 10px;">
+                        🗑️ Delete All Data
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📊 Current Data Summary</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 15px;">
+                    <div style="background: #f0fdf4; padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 32px; font-weight: bold; color: #10b981;" id="totalSalesCount">0</div>
+                        <div style="color: #065f46; margin-top: 5px;">Sales Records</div>
+                    </div>
+                    <div style="background: #fef3c7; padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 32px; font-weight: bold; color: #f59e0b;" id="totalPurchasesCount">0</div>
+                        <div style="color: #78350f; margin-top: 5px;">Purchase Records</div>
+                    </div>
+                    <div style="background: #dbeafe; padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 32px; font-weight: bold; color: #3b82f6;" id="totalTransportCount">0</div>
+                        <div style="color: #1e40af; margin-top: 5px;">Transport Records</div>
+                    </div>
+                    <div style="background: #fce7f3; padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 32px; font-weight: bold; color: #ec4899;" id="totalExpensesCount">0</div>
+                        <div style="color: #831843; margin-top: 5px;">Expense Records</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -689,6 +756,8 @@
                 updateDashboard();
             } else if (tabName === 'reports') {
                 generateReports();
+            } else if (tabName === 'backup') {
+                updateBackupStats();
             }
         }
 
@@ -1023,6 +1092,143 @@
             const msg = document.getElementById(elementId);
             msg.classList.add('show');
             setTimeout(() => msg.classList.remove('show'), 3000);
+        }
+
+        // Backup Functions
+        function updateBackupStats() {
+            document.getElementById('totalSalesCount').textContent = sales.length;
+            document.getElementById('totalPurchasesCount').textContent = purchases.length;
+            document.getElementById('totalTransportCount').textContent = transportIncome.length;
+            document.getElementById('totalExpensesCount').textContent = expenses.length;
+        }
+
+        function emailBackup() {
+            const backupData = {
+                sales: sales,
+                purchases: purchases,
+                expenses: expenses,
+                transportIncome: transportIncome,
+                backupDate: new Date().toISOString(),
+                totalRecords: sales.length + purchases.length + expenses.length + transportIncome.length
+            };
+
+            const dataStr = JSON.stringify(backupData, null, 2);
+            
+            // Calculate totals for email body
+            const totalSales = sales.reduce((sum, s) => sum + s.amount, 0);
+            const totalPurchases = purchases.reduce((sum, p) => sum + p.total, 0);
+            const totalTransport = transportIncome.reduce((sum, t) => sum + t.amount, 0);
+            const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
+
+            const emailSubject = encodeURIComponent('Shop Manager Backup - ' + new Date().toLocaleDateString());
+            const emailBody = encodeURIComponent(
+                `Shop Manager Data Backup
+Date: ${new Date().toLocaleString()}
+
+=== SUMMARY ===
+Total Sales Records: ${sales.length} (₹${totalSales.toLocaleString()})
+Total Purchase Records: ${purchases.length} (₹${totalPurchases.toLocaleString()})
+Total Transport Records: ${transportIncome.length} (₹${totalTransport.toLocaleString()})
+Total Expense Records: ${expenses.length} (₹${totalExpenses.toLocaleString()})
+Total Records: ${backupData.totalRecords}
+
+=== BACKUP DATA (Copy and save this) ===
+${dataStr}
+
+=== HOW TO RESTORE ===
+1. Open your Shop Manager app
+2. Go to Backup tab
+3. Click "Restore from Backup File"
+4. Copy the data from this email
+5. Save it as a .json file and upload
+
+Keep this email safe for future restoration!`
+            );
+
+            window.location.href = `mailto:?subject=${emailSubject}&body=${emailBody}`;
+        }
+
+        function downloadBackup() {
+            const backupData = {
+                sales: sales,
+                purchases: purchases,
+                expenses: expenses,
+                transportIncome: transportIncome,
+                backupDate: new Date().toISOString(),
+                totalRecords: sales.length + purchases.length + expenses.length + transportIncome.length
+            };
+
+            const dataStr = JSON.stringify(backupData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `shop-manager-backup-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            alert('✅ Backup downloaded! Save this file safely in Google Drive or WhatsApp.');
+        }
+
+        function restoreBackup(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const backupData = JSON.parse(e.target.result);
+                    
+                    if (confirm('⚠️ This will replace all current data with backup data. Continue?')) {
+                        sales = backupData.sales || [];
+                        purchases = backupData.purchases || [];
+                        expenses = backupData.expenses || [];
+                        transportIncome = backupData.transportIncome || [];
+                        
+                        saveData();
+                        
+                        renderSales();
+                        renderPurchases();
+                        renderExpenses();
+                        renderTransportIncome();
+                        updateDashboard();
+                        updateBackupStats();
+                        
+                        alert('✅ Data restored successfully from backup!');
+                    }
+                } catch (error) {
+                    alert('❌ Error: Invalid backup file. Please select a valid backup file.');
+                }
+            };
+            reader.readAsText(file);
+            
+            // Reset file input
+            event.target.value = '';
+        }
+
+        function deleteAllData() {
+            if (confirm('⚠️ WARNING: This will permanently delete ALL your data!\n\nThis includes:\n- All Sales Records\n- All Purchase Records\n- All Transport Records\n- All Expense Records\n\nThis action CANNOT be undone!\n\nAre you absolutely sure?')) {
+                if (confirm('🚨 FINAL WARNING: You are about to delete everything. Are you 100% sure?')) {
+                    sales = [];
+                    purchases = [];
+                    expenses = [];
+                    transportIncome = [];
+                    
+                    saveData();
+                    
+                    renderSales();
+                    renderPurchases();
+                    renderExpenses();
+                    renderTransportIncome();
+                    updateDashboard();
+                    updateBackupStats();
+                    
+                    alert('✅ All data has been deleted.');
+                }
+            }
         }
 
         // Initialize on load
