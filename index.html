@@ -7,16 +7,38 @@
     <meta name="theme-color" content="#667eea">
     <title>Shop Manager Pro</title>
     
-    <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
-    
-    <!-- Apple Touch Icon -->
-    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon192.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
     <style>
-        /* Add install button styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
         .install-prompt {
             position: fixed;
             bottom: 20px;
@@ -43,33 +65,6 @@
         @keyframes slideUp {
             from { bottom: -100px; opacity: 0; }
             to { bottom: 20px; opacity: 1; }
-        }
-        
-        /* Existing styles remain the same... */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
         }
 
         .tabs {
@@ -202,6 +197,15 @@
             background: #dc2626;
         }
 
+        .btn-secondary {
+            background: #6b7280;
+            margin-left: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -248,6 +252,46 @@
             display: block;
         }
 
+        .filter-section {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .filter-section select {
+            padding: 8px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+
+        .monthly-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .month-card {
+            background: #f0f9ff;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .month-card h4 {
+            color: #1e40af;
+            margin-bottom: 8px;
+        }
+
+        .month-card .amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1e3a8a;
+        }
+
         @media (max-width: 768px) {
             .tabs {
                 overflow-x: auto;
@@ -256,11 +300,15 @@
             table {
                 font-size: 14px;
             }
+
+            .filter-section select {
+                width: 100%;
+                margin-bottom: 10px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Install Prompt -->
     <div class="install-prompt" id="installPrompt">
         📱 Install App
     </div>
@@ -271,24 +319,37 @@
             <p>Simple & Fast Business Tracking</p>
         </div>
 
-        <!-- Navigation Tabs -->
         <div class="tabs">
             <button class="tab active" onclick="showTab('dashboard')">📊 Dashboard</button>
             <button class="tab" onclick="showTab('sales')">💰 Sales</button>
             <button class="tab" onclick="showTab('purchases')">📦 Purchases</button>
             <button class="tab" onclick="showTab('transport')">🚚 Transport</button>
             <button class="tab" onclick="showTab('expenses')">💸 Expenses</button>
+            <button class="tab" onclick="showTab('reports')">📈 Reports</button>
         </div>
 
         <!-- Dashboard -->
         <div id="dashboard" class="content active">
+            <div class="card">
+                <h2>📅 Quick View</h2>
+                <div class="filter-section">
+                    <label><strong>View:</strong></label>
+                    <select id="dashboardFilter" onchange="updateDashboard()">
+                        <option value="today">Today</option>
+                        <option value="month">This Month</option>
+                        <option value="year">This Year</option>
+                        <option value="all">All Time</option>
+                    </select>
+                </div>
+            </div>
+
             <div class="dashboard">
                 <div class="stat-card sales">
-                    <h3>Today's Sales</h3>
+                    <h3>Sales</h3>
                     <div class="value" id="totalSales">₹0</div>
                 </div>
                 <div class="stat-card transport">
-                    <h3>Transport Income (Today)</h3>
+                    <h3>Transport Income</h3>
                     <div class="value" id="totalTransportIncome">₹0</div>
                 </div>
                 <div class="stat-card due">
@@ -296,7 +357,7 @@
                     <div class="value" id="totalDue">₹0</div>
                 </div>
                 <div class="stat-card expense">
-                    <h3>Today's Expenses</h3>
+                    <h3>Expenses</h3>
                     <div class="value" id="totalExpenses">₹0</div>
                 </div>
             </div>
@@ -330,6 +391,14 @@
 
             <div class="card">
                 <h2>Sales History</h2>
+                <div class="filter-section">
+                    <select id="salesFilter" onchange="renderSales()">
+                        <option value="all">All Time</option>
+                        <option value="today">Today</option>
+                        <option value="month">This Month</option>
+                        <option value="year">This Year</option>
+                    </select>
+                </div>
                 <table>
                     <thead>
                         <tr>
@@ -373,6 +442,14 @@
 
             <div class="card">
                 <h2>Purchase History</h2>
+                <div class="filter-section">
+                    <select id="purchasesFilter" onchange="renderPurchases()">
+                        <option value="all">All Time</option>
+                        <option value="today">Today</option>
+                        <option value="month">This Month</option>
+                        <option value="year">This Year</option>
+                    </select>
+                </div>
                 <table>
                     <thead>
                         <tr>
@@ -426,6 +503,14 @@
 
             <div class="card">
                 <h2>Expense History</h2>
+                <div class="filter-section">
+                    <select id="expensesFilter" onchange="renderExpenses()">
+                        <option value="all">All Time</option>
+                        <option value="today">Today</option>
+                        <option value="month">This Month</option>
+                        <option value="year">This Year</option>
+                    </select>
+                </div>
                 <table>
                     <thead>
                         <tr>
@@ -470,6 +555,14 @@
 
             <div class="card">
                 <h2>Transport Income History</h2>
+                <div class="filter-section">
+                    <select id="transportFilter" onchange="renderTransportIncome()">
+                        <option value="all">All Time</option>
+                        <option value="today">Today</option>
+                        <option value="month">This Month</option>
+                        <option value="year">This Year</option>
+                    </select>
+                </div>
                 <table>
                     <thead>
                         <tr>
@@ -486,6 +579,32 @@
                         </tr>
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- Reports Section -->
+        <div id="reports" class="content">
+            <div class="card">
+                <h2>📊 Monthly & Yearly Reports</h2>
+                <div class="filter-section">
+                    <select id="reportYear" onchange="generateReports()">
+                        <option value="2024">2024</option>
+                        <option value="2025">2025</option>
+                        <option value="2026">2026</option>
+                    </select>
+                    <select id="reportType" onchange="generateReports()">
+                        <option value="sales">Sales</option>
+                        <option value="transport">Transport Income</option>
+                        <option value="expenses">Expenses</option>
+                        <option value="purchases">Purchases</option>
+                    </select>
+                </div>
+                <div id="monthlyReports"></div>
+            </div>
+
+            <div class="card">
+                <h2>📈 Yearly Summary</h2>
+                <div id="yearlySummary"></div>
             </div>
         </div>
     </div>
@@ -519,7 +638,7 @@
             });
         }
 
-        // Data storage using localStorage
+        // Data storage - PERMANENT with localStorage
         let sales = JSON.parse(localStorage.getItem('sales')) || [];
         let purchases = JSON.parse(localStorage.getItem('purchases')) || [];
         let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
@@ -532,6 +651,32 @@
             localStorage.setItem('transportIncome', JSON.stringify(transportIncome));
         }
 
+        // Helper functions for date filtering
+        function isToday(date) {
+            const d = new Date(date);
+            const today = new Date();
+            return d.toDateString() === today.toDateString();
+        }
+
+        function isThisMonth(date) {
+            const d = new Date(date);
+            const now = new Date();
+            return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+        }
+
+        function isThisYear(date) {
+            const d = new Date(date);
+            const now = new Date();
+            return d.getFullYear() === now.getFullYear();
+        }
+
+        function filterByPeriod(data, period) {
+            if (period === 'today') return data.filter(item => isToday(item.date));
+            if (period === 'month') return data.filter(item => isThisMonth(item.date));
+            if (period === 'year') return data.filter(item => isThisYear(item.date));
+            return data;
+        }
+
         // Tab switching
         function showTab(tabName) {
             document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
@@ -542,31 +687,28 @@
             
             if (tabName === 'dashboard') {
                 updateDashboard();
+            } else if (tabName === 'reports') {
+                generateReports();
             }
         }
 
         // Update Dashboard
         function updateDashboard() {
-            const today = new Date().toDateString();
+            const filter = document.getElementById('dashboardFilter').value;
             
-            const todaySales = sales
-                .filter(s => new Date(s.date).toDateString() === today)
-                .reduce((sum, s) => sum + s.amount, 0);
+            const filteredSales = filterByPeriod(sales, filter);
+            const filteredTransport = filterByPeriod(transportIncome, filter);
+            const filteredExpenses = filterByPeriod(expenses, filter);
             
-            const todayTransportIncome = transportIncome
-                .filter(t => new Date(t.date).toDateString() === today)
-                .reduce((sum, t) => sum + t.amount, 0);
-            
+            const totalSales = filteredSales.reduce((sum, s) => sum + s.amount, 0);
+            const totalTransport = filteredTransport.reduce((sum, t) => sum + t.amount, 0);
+            const totalExpenses = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
             const totalDue = purchases.reduce((sum, p) => sum + p.due, 0);
             
-            const todayExpenses = expenses
-                .filter(e => new Date(e.date).toDateString() === today)
-                .reduce((sum, e) => sum + e.amount, 0);
-            
-            document.getElementById('totalSales').textContent = `₹${todaySales.toLocaleString()}`;
-            document.getElementById('totalTransportIncome').textContent = `₹${todayTransportIncome.toLocaleString()}`;
+            document.getElementById('totalSales').textContent = `₹${totalSales.toLocaleString()}`;
+            document.getElementById('totalTransportIncome').textContent = `₹${totalTransport.toLocaleString()}`;
             document.getElementById('totalDue').textContent = `₹${totalDue.toLocaleString()}`;
-            document.getElementById('totalExpenses').textContent = `₹${todayExpenses.toLocaleString()}`;
+            document.getElementById('totalExpenses').textContent = `₹${totalExpenses.toLocaleString()}`;
             
             updateRecentActivity();
         }
@@ -578,7 +720,7 @@
                 ...purchases.map(p => ({...p, type: 'purchase'})),
                 ...expenses.map(e => ({...e, type: 'expense'})),
                 ...transportIncome.map(t => ({...t, type: 'transport'}))
-            ].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+            ].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 10);
             
             if (allActivities.length === 0) {
                 activity.innerHTML = '<p>No activity yet. Start by adding sales, purchases, transport, or expenses.</p>';
@@ -628,14 +770,16 @@
         });
 
         function renderSales() {
+            const filter = document.getElementById('salesFilter').value;
+            const filtered = filterByPeriod(sales, filter);
             const tbody = document.getElementById('salesTable');
             
-            if (sales.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #999;">No sales recorded yet</td></tr>';
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #999;">No sales recorded for this period</td></tr>';
                 return;
             }
             
-            tbody.innerHTML = sales.map(s => `
+            tbody.innerHTML = filtered.map(s => `
                 <tr>
                     <td>${new Date(s.date).toLocaleString()}</td>
                     <td>${s.customer}</td>
@@ -680,14 +824,16 @@
         });
 
         function renderPurchases() {
+            const filter = document.getElementById('purchasesFilter').value;
+            const filtered = filterByPeriod(purchases, filter);
             const tbody = document.getElementById('purchasesTable');
             
-            if (purchases.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #999;">No purchases recorded yet</td></tr>';
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #999;">No purchases recorded for this period</td></tr>';
                 return;
             }
             
-            tbody.innerHTML = purchases.map(p => {
+            tbody.innerHTML = filtered.map(p => {
                 const dueStyle = p.due > 0 ? 'color: #ef4444; font-weight: bold;' : '';
                 return `
                     <tr>
@@ -733,14 +879,16 @@
         });
 
         function renderExpenses() {
+            const filter = document.getElementById('expensesFilter').value;
+            const filtered = filterByPeriod(expenses, filter);
             const tbody = document.getElementById('expensesTable');
             
-            if (expenses.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999;">No expenses recorded yet</td></tr>';
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999;">No expenses recorded for this period</td></tr>';
                 return;
             }
             
-            tbody.innerHTML = expenses.map(e => `
+            tbody.innerHTML = filtered.map(e => `
                 <tr>
                     <td>${new Date(e.date).toLocaleDateString()}</td>
                     <td>${e.category}</td>
@@ -782,14 +930,16 @@
         });
 
         function renderTransportIncome() {
+            const filter = document.getElementById('transportFilter').value;
+            const filtered = filterByPeriod(transportIncome, filter);
             const tbody = document.getElementById('transportIncomeTable');
             
-            if (transportIncome.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999;">No transport income recorded yet</td></tr>';
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999;">No transport income recorded for this period</td></tr>';
                 return;
             }
             
-            tbody.innerHTML = transportIncome.map(t => `
+            tbody.innerHTML = filtered.map(t => `
                 <tr>
                     <td>${new Date(t.date).toLocaleString()}</td>
                     <td>${t.trip}</td>
@@ -809,6 +959,66 @@
             }
         }
 
+        // Generate Reports
+        function generateReports() {
+            const year = parseInt(document.getElementById('reportYear').value);
+            const type = document.getElementById('reportType').value;
+            
+            let data;
+            if (type === 'sales') data = sales;
+            else if (type === 'transport') data = transportIncome;
+            else if (type === 'expenses') data = expenses;
+            else if (type === 'purchases') data = purchases;
+            
+            const monthlyData = {};
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            
+            // Initialize all months
+            months.forEach((month, idx) => {
+                monthlyData[month] = { total: 0, count: 0 };
+            });
+            
+            // Calculate monthly totals
+            data.forEach(item => {
+                const d = new Date(item.date);
+                if (d.getFullYear() === year) {
+                    const month = months[d.getMonth()];
+                    if (type === 'purchases') {
+                        monthlyData[month].total += item.total;
+                    } else {
+                        monthlyData[month].total += item.amount;
+                    }
+                    monthlyData[month].count++;
+                }
+            });
+            
+            // Display monthly reports
+            let html = '<div class="monthly-grid">';
+            months.forEach(month => {
+                html += `
+                    <div class="month-card">
+                        <h4>${month} ${year}</h4>
+                        <div class="amount">₹${monthlyData[month].total.toLocaleString()}</div>
+                        <small>${monthlyData[month].count} transactions</small>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            document.getElementById('monthlyReports').innerHTML = html;
+            
+            // Yearly summary
+            const yearTotal = Object.values(monthlyData).reduce((sum, m) => sum + m.total, 0);
+            const yearCount = Object.values(monthlyData).reduce((sum, m) => sum + m.count, 0);
+            
+            document.getElementById('yearlySummary').innerHTML = `
+                <div style="background: #f0fdf4; padding: 20px; border-radius: 8px; border-left: 4px solid #10b981;">
+                    <h3 style="color: #065f46; margin-bottom: 10px;">Total ${type.charAt(0).toUpperCase() + type.slice(1)} for ${year}</h3>
+                    <div style="font-size: 36px; font-weight: bold; color: #047857;">₹${yearTotal.toLocaleString()}</div>
+                    <p style="color: #065f46; margin-top: 10px;">${yearCount} total transactions</p>
+                </div>
+            `;
+        }
+
         function showSuccess(elementId) {
             const msg = document.getElementById(elementId);
             msg.classList.add('show');
@@ -821,6 +1031,9 @@
         renderExpenses();
         renderTransportIncome();
         updateDashboard();
+        
+        // Set current year in reports
+        document.getElementById('reportYear').value = new Date().getFullYear();
     </script>
 </body>
 </html>
