@@ -37,6 +37,61 @@
             border-radius: 10px;
             margin-bottom: 20px;
             text-align: center;
+            position: relative;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .header-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .install-guide {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .install-guide.show {
+            display: block;
+        }
+
+        .install-guide h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .install-guide ol {
+            margin-left: 20px;
+            color: #666;
+        }
+
+        .install-guide ol li {
+            margin-bottom: 10px;
+            line-height: 1.6;
         }
 
         .install-prompt {
@@ -317,6 +372,56 @@
         <div class="header">
             <h1>📊 Shop Manager</h1>
             <p>Simple & Fast Business Tracking</p>
+            <div class="header-buttons">
+                <button id="installBtn" class="header-btn" style="display: none;">
+                    📱 Install App
+                </button>
+                <button id="shareBtn" class="header-btn" onclick="shareApp()">
+                    🔗 Share App
+                </button>
+                <button id="howToInstallBtn" class="header-btn" onclick="toggleInstallGuide()" style="display: none;">
+                    ❓ How to Install
+                </button>
+            </div>
+        </div>
+
+        <!-- Install Guide -->
+        <div class="install-guide" id="installGuide">
+            <h3>📱 How to Install Shop Manager App</h3>
+            
+            <div style="margin-bottom: 20px;">
+                <strong style="color: #10b981;">📱 On Android (Chrome):</strong>
+                <ol>
+                    <li>Click the <strong>"Install App"</strong> button above, OR</li>
+                    <li>Tap the <strong>3 dots menu (⋮)</strong> at top right</li>
+                    <li>Select <strong>"Add to Home screen"</strong> or <strong>"Install app"</strong></li>
+                    <li>Tap <strong>"Add"</strong> or <strong>"Install"</strong></li>
+                    <li>App icon will appear on your home screen! ✅</li>
+                </ol>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <strong style="color: #3b82f6;">📱 On iPhone (Safari):</strong>
+                <ol>
+                    <li>Tap the <strong>Share button (□↑)</strong> at the bottom</li>
+                    <li>Scroll down and tap <strong>"Add to Home Screen"</strong></li>
+                    <li>Tap <strong>"Add"</strong> at top right</li>
+                    <li>App icon will appear on your home screen! ✅</li>
+                </ol>
+            </div>
+
+            <div>
+                <strong style="color: #8b5cf6;">💻 On Desktop (Chrome/Edge):</strong>
+                <ol>
+                    <li>Look for the <strong>install icon (⊕)</strong> in the address bar</li>
+                    <li>Click it and select <strong>"Install"</strong></li>
+                    <li>App will open in its own window! ✅</li>
+                </ol>
+            </div>
+
+            <button onclick="toggleInstallGuide()" class="btn" style="margin-top: 15px; background: #6b7280;">
+                Close Guide
+            </button>
         </div>
 
         <div class="tabs">
@@ -677,24 +782,89 @@
     </div>
 
     <script>
-        // PWA Install Prompt
+        // PWA Install Management
         let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
         const installPrompt = document.getElementById('installPrompt');
+        const howToInstallBtn = document.getElementById('howToInstallBtn');
+
+        // Check if app is already installed
+        window.addEventListener('load', () => {
+            // Check if running as installed PWA
+            if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+                // App is installed - hide install buttons
+                installBtn.style.display = 'none';
+                howToInstallBtn.style.display = 'none';
+                installPrompt.style.display = 'none';
+            } else {
+                // App not installed - show install options
+                howToInstallBtn.style.display = 'inline-block';
+            }
+        });
 
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            installPrompt.classList.add('show');
+            
+            // Only show if not already installed
+            if (!window.matchMedia('(display-mode: standalone)').matches) {
+                installBtn.style.display = 'inline-block';
+                installPrompt.classList.add('show');
+            }
+        });
+
+        // Install button click
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    installBtn.style.display = 'none';
+                    howToInstallBtn.style.display = 'none';
+                }
+                deferredPrompt = null;
+            }
         });
 
         installPrompt.addEventListener('click', async () => {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    installPrompt.classList.remove('show');
+                }
                 deferredPrompt = null;
-                installPrompt.classList.remove('show');
             }
         });
+
+        // Share App Function
+        function shareApp() {
+            const shareData = {
+                title: 'Shop Manager Pro',
+                text: 'Check out this amazing Shop Manager app! Track sales, expenses, purchases & transport income easily.',
+                url: window.location.href
+            };
+
+            if (navigator.share) {
+                // Mobile share
+                navigator.share(shareData)
+                    .catch(err => console.log('Share cancelled'));
+            } else {
+                // Desktop - copy link
+                navigator.clipboard.writeText(window.location.href)
+                    .then(() => alert('✅ App link copied to clipboard! Share it with anyone.'))
+                    .catch(() => {
+                        // Fallback
+                        prompt('Copy this link to share:', window.location.href);
+                    });
+            }
+        }
+
+        // Toggle Install Guide
+        function toggleInstallGuide() {
+            const guide = document.getElementById('installGuide');
+            guide.classList.toggle('show');
+        }
 
         // Register Service Worker
         if ('serviceWorker' in navigator) {
